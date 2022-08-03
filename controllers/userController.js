@@ -27,7 +27,5 @@ const deleteUser = async  (req, res)=> {
     res.send("User Deleted Successfull");
 }
 
-module.exports.createUser = createUser
-module.exports.getUser = getUser
-module.exports.updateUser = updateUser
-module.exports.deleteUser = deleteUser
+module.exports = { createUser, getUser, updateUser, deleteUser }
+
