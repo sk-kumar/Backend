@@ -1,8 +1,15 @@
 const userModel = require('../models/userModel.js');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
-const createUser = async  (req, res)=> {
-    let data = await userModel.create(req.body);
+const createUser = async (req, res) => {
+    let { firstName, lastName, email, password, mobile } = req.body
+    let user = await userModel.findOne({ email });
+    if (user) {
+        return res.status(400).send({ message: "Email Id already registered" });
+    }
+    let hashPassword =await bcrypt.hash(password, 10);
+    let data = await userModel.create({firstName,lastName,email,password:hashPassword,mobile});
     console.log(data);
     res.send(data);
 }
@@ -13,7 +20,8 @@ const loginUser = async (req, res) => {
     if (!user) {
         return res.status(400).send({ message: "Username or Password wrong" });
     }
-    if (password !== user.password) {
+    let checkPassword = await bcrypt.compare(password,user.password)
+    if (!checkPassword) {
         return res.status(400).send({ message: "Username or Password wrong" });
     }
     const token = jwt.sign({ _id: user._id }, 'secretkey', { expiresIn: '1d' });
