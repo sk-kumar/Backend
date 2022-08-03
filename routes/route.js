@@ -1,36 +1,17 @@
 const express = require('express');
-const userModel = require('../models/userModel');
+const userController = require('../controllers/userController');
 const router = express.Router();
 
 // POST
-router.post('/user', async (req, res)=> {
-    let data = await userModel.create(req.body);
-    console.log(data);
-    res.send(data);
-});
+router.post('/user',userController.createUser);
 
 // GET
-router.get('/user/:id', async (req, res)=> {
-    let id = req.params.id
-    let user = await userModel.findById(id)
-    console.log(user);
-    res.send(user);
-});
+router.get('/user/:id',userController.getUser);
 
 // PUT
-router.put('/user/:id', async (req, res) => {
-    let id = req.params.id
-    let user = await userModel.findByIdAndUpdate(id, { $set: req.body }, { new: true });
-    console.log(user);
-    res.send(user);
-});
+router.put('/user/:id',userController.updateUser);
 
 // DELETE
-router.delete('/user/:id', async (req, res) => {
-    let id = req.params.id
-    await userModel.findByIdAndDelete(id)
-    console.log("User Deleted Successfull");
-    res.send("User Deleted Successfull");
-});
+router.delete('/user/:id',userController.deleteUser);
 
 module.exports = router;
