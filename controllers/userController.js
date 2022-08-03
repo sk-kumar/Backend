@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const { isValidReqBody, isValidStr, isValidEmail} = require('../validation/validationFunction.js');
 
 const createUser = async (req, res) => {
-    let { firstName, lastName,gender,email, password, mobile } = req.body
+    let { firstName, lastName,gender,email, password, mobile,address } = req.body
     if (!isValidReqBody(req.body)) {
         return res.status(400).send({ message: "All field are required" });
     }
@@ -38,11 +38,31 @@ const createUser = async (req, res) => {
     if (!mobile) {
         return res.status(400).send({ message: "Mobile Number is  required" });
     }
+    if (!typeof mobile === 'number') {
+        return res.status(400).send({ message: "Please enter a valid number" });
+    }
     let userMobile = await userModel.findOne({ mobile });
     if (userMobile) {
         return res.status(400).send({ message: "Mobile already registered" });
     }
-    let data = await userModel.create({ firstName, lastName,gender, email, password: hashPassword, mobile });
+    if (!address) {
+        return res.status(400).send({ message: "Address is required" });
+    }
+    let { street, city, pincode } = JSON.parse(address)
+    if (!isValidStr(street)) {
+        return res.status(400).send({ message: "street field is required" });
+    }
+    if (!isValidStr(city)) {
+        return res.status(400).send({ message: "City field is required" });
+    }
+    if (!pincode) {
+        return res.status(400).send({ message: "Pincode field is required" });
+    }
+    if (!typeof pincode === 'number') {
+        return res.status(400).send({ message: "Please enter a valid pincode" });
+    }
+    let addressDetails = JSON.parse(address);
+    let data = await userModel.create({ firstName, lastName, gender, email, password: hashPassword, mobile,address:addressDetails });
     // console.log(data);
     res.status(201).send(data);
 }
