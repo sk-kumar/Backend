@@ -2,32 +2,23 @@ const jwt = require('jsonwebtoken');
 //Verify Token
 const auth = async (req, res, next) => {
     try {
-
         //Check token in header
-        const bearerHeader = req.headers['authorization'];
-        //check if bearer is undefined
-        if (typeof bearerHeader == 'undefined') {
+        const token = req.header('x-auth-key');
+        //check if token not available
+        if (!token) {
             //Fobidden
-            res.sendStatus(403);
+            return res.status(403).send({ message: "Missing authentication token" });
         }
-            //split the space at the bearer
-            const bearer = bearerHeader.split(' ');
-            //Get token from string
-            const bearerToken = bearer[1];
-            //set the token
-            req.token = bearerToken;
-
-            // verify token
-        const decoded = jwt.verify(bearerToken, 'secretkey');
-
+        // verify token
+        const decoded = jwt.verify(token, 'secretkey');
         if (!decoded) {
-            res.status(403).send("Unauthorize access");
+            return res.status(403).send("Unauthorize access");
         }
         //next middleweare
         next();
 
     } catch (error) {
-        res.status(500).send(error.message);
+        return res.status(500).send(error.message);
     }
 }
 
