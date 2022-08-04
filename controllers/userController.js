@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const { isValidReqBody, isValidStr, isValidEmail} = require('../validation/validationFunction.js');
 
 const createUser = async (req, res) => {
+    // console.log(req.file);
     let { firstName, lastName,gender,email, password, mobile,address } = req.body
     if (!isValidReqBody(req.body)) {
         return res.status(400).send({ message: "All field are required" });
@@ -61,8 +62,11 @@ const createUser = async (req, res) => {
     if (!typeof pincode === 'number') {
         return res.status(400).send({ message: "Please enter a valid pincode" });
     }
+    if (!req.file) {
+        return res.status(400).send({ message: "Profile Image is required" });
+    }
     let addressDetails = JSON.parse(address);
-    let data = await userModel.create({ firstName, lastName, gender, email, password: hashPassword, mobile,address:addressDetails });
+    let data = await userModel.create({ firstName, lastName, gender, email, password: hashPassword, mobile,address:addressDetails,profileImage:req.file.path});
     // console.log(data);
     res.status(201).send(data);
 }
